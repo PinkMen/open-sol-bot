@@ -30,6 +30,7 @@ class CopyTradeStates(StatesGroup):
 class MonitorStates(StatesGroup):
     MENU = State()
     CREATING = State()  # 创建跟单状态
+    CREATING_PUMP = State()  # 创建跟单状态
     CREATE_WAITING_FOR_ADDRESS = State()  # 创建时等待输入钱包地址
     CREATE_WAITING_FOR_ALIAS = State()  # 创建时等待输入别名
 
