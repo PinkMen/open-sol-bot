@@ -46,12 +46,10 @@ def monitor_keyboard_menu(
     )
     items.append(
         [
-            InlineKeyboardButton(
                InlineKeyboardButton(
                     text="停止/开启监听 pump.fun",
                     callback_data="start_pump_monitor",
-                ),
-            )
+                )
         ]
     )
 
