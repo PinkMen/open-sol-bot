@@ -17,7 +17,6 @@ from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 
 from wallet_tracker.constants import NEW_PUMP_TOKEN_CHANNEL
 
-
 class PumpMonitor:
     def __init__(
         self,
@@ -40,6 +39,7 @@ class PumpMonitor:
         self.is_running = False
         self.websocket = None
         self.subscription_id = None
+        self.pumpfun_url = settings.api.pumpportal_api_data_url
 
     async def process_pump_event(self, message: ProgramNotification) -> None:
         """
@@ -69,7 +69,7 @@ class PumpMonitor:
             return
 
         logger.debug("Subscribing to Pump.fun blocks")
-        await self.websocket.block_subscribe(
+        await self.websocket.program_subscribe(
             filter_="all",
             commitment=settings.rpc.commitment,
             encoding="base64",
@@ -101,7 +101,7 @@ class PumpMonitor:
         while self.is_running:
             try:
                 async with connect(
-                    self.websocket_url,
+                    self.pumpfun_url,
                     ping_timeout=30,
                     ping_interval=20,
                     close_timeout=20,
@@ -115,11 +115,12 @@ class PumpMonitor:
                         try:
                             messages = await websocket.recv()
                             for message in messages:
-                                if isinstance(message, SubscriptionResult):
-                                    self.subscription_id = message.result
-                                    logger.info(f"Subscribed to blocks with ID: {self.subscription_id}")
-                                elif isinstance(message, ProgramNotification):
-                                    await self.process_block_event(message)
+                                 logger.info(f"received message: {message}")
+                                # if isinstance(message, SubscriptionResult):
+                                #     self.subscription_id = message.result
+                                #     logger.info(f"Subscribed to blocks with ID: {self.subscription_id}")
+                                # elif isinstance(message, ProgramNotification):
+                                #     await self.process_block_event(message)
                         except (ConnectionClosedError, ConnectionClosedOK) as e:
                             logger.warning(f"WebSocket connection closed: {e}")
                             break
