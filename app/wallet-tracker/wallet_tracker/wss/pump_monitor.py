@@ -74,7 +74,7 @@ class PumpMonitor:
             filters="all",
             commitment=commitment.Confirmed,
             encoding="jsonParsed",
-            program=PUMP_FUN_PROGRAM  # 只监听Pump.fun程序的区块
+            program_id=PUMP_FUN_PROGRAM  # 只监听Pump.fun程序的区块
         )
 
     async def process_block_event(self, message: ProgramNotification) -> None:
