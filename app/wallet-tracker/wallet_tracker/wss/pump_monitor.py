@@ -97,10 +97,10 @@ class PumpMonitor:
                     logger.info(f"Connected to Solana WebSocket RPC: {self.websocket_url}")
                     
                     await self.websocket.program_subscribe(
-                        filters="all",
+                        program_id=PUMP_FUN_PROGRAM,  # 只监听Pump.fun程序的区块
                         commitment="confirmed",
+                        filters="all",
                         encoding="jsonParsed",
-                        program_id=PUMP_FUN_PROGRAM  # 只监听Pump.fun程序的区块
                     )
 
                     while self.is_running:
