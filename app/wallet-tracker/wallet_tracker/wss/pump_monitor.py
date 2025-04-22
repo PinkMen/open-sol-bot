@@ -63,20 +63,6 @@ class PumpMonitor:
         except Exception as e:
             logger.error(f"Error processing Pump event: {e}")
 
-    async def subscribe_pump(self) -> None:
-        """订阅Pump.fun区块事件"""
-        if not self.websocket:
-            logger.warning("WebSocket connection is not established")
-            return
-
-        logger.debug("Subscribing to Pump.fun blocks")
-        await self.websocket.program_subscribe(
-            filters="all",
-            commitment=commitment.Confirmed,
-            encoding="jsonParsed",
-            program_id=PUMP_FUN_PROGRAM  # 只监听Pump.fun程序的区块
-        )
-
     async def process_block_event(self, message: ProgramNotification) -> None:
         """
         处理Pump.fun区块事件
@@ -110,7 +96,12 @@ class PumpMonitor:
                     self.websocket = websocket
                     logger.info(f"Connected to Solana WebSocket RPC: {self.websocket_url}")
                     
-                    await self.subscribe_pump()
+                    await self.websocket.program_subscribe(
+                        filters="all",
+                        commitment=commitment.Confirmed,
+                        encoding="jsonParsed",
+                        program_id=PUMP_FUN_PROGRAM  # 只监听Pump.fun程序的区块
+                    )
 
                     while self.is_running:
                         try:
