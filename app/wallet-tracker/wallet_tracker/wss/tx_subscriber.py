@@ -20,7 +20,7 @@ from wallet_tracker.exceptions import NotSwapTransaction, TransactionError
 from wallet_tracker.wss.tx_detail_fetcher import TxDetailRawFetcher
 
 from .account_log_monitor import AccountLogMonitor
-
+from .pump_monitor import PumpMonitor
 
 class TransactionDetailSubscriber:
     """
@@ -45,6 +45,10 @@ class TransactionDetailSubscriber:
         self.lock = asyncio.Lock()
         self.account_log_monitor = AccountLogMonitor(
             self.wallets,
+            settings.rpc.rpc_url,
+            self.redis,
+        )
+        self.pump_monitor= PumpMonitor(
             settings.rpc.rpc_url,
             self.redis,
         )
@@ -164,8 +168,10 @@ class TransactionDetailSubscriber:
 
         async def _f():
             try:
+                await self.pump_monitor.start()
                 # 启动日志订阅
                 await self.account_log_monitor.start()
+                
                 await asyncio.gather(*self.workers)
             except Exception as e:
                 logger.error(f"Worker pool error: {e}")
