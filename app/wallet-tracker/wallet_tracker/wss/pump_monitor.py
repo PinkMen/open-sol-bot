@@ -98,7 +98,7 @@ class PumpMonitor:
                     
                     await self.websocket.program_subscribe(
                         filters="all",
-                        commitment=commitment.Confirmed,
+                        commitment="confirmed",
                         encoding="jsonParsed",
                         program_id=PUMP_FUN_PROGRAM  # 只监听Pump.fun程序的区块
                     )
