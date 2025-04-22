@@ -7,7 +7,6 @@ import asyncio
 from typing import Optional
 
 import aioredis
-from app.trading.trading.executor import PUMP_FUN_PROGRAM_ID
 from solana.rpc.websocket_api import connect
 from solbot_common.config import settings
 from solbot_common.log import logger
@@ -74,7 +73,7 @@ class PumpMonitor:
             filter_="all",
             commitment=settings.rpc.commitment,
             encoding="base64",
-            program=PUMP_FUN_PROGRAM_ID  # 只监听Pump.fun程序的区块
+            program=PUMP_FUN_PROGRAM  # 只监听Pump.fun程序的区块
         )
 
     async def process_block_event(self, message: ProgramNotification) -> None:
