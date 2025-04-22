@@ -14,6 +14,7 @@ from solbot_common.constants import PUMP_FUN_PROGRAM
 from solders.pubkey import Pubkey
 from solders.rpc.responses import SubscriptionResult, ProgramNotification
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
+from solana.rpc import commitment
 
 from wallet_tracker.constants import NEW_PUMP_TOKEN_CHANNEL
 
@@ -70,9 +71,9 @@ class PumpMonitor:
 
         logger.debug("Subscribing to Pump.fun blocks")
         await self.websocket.program_subscribe(
-            filter_="all",
-            commitment=settings.rpc.commitment,
-            encoding="base64",
+            filters="all",
+            commitment=commitment.Confirmed,
+            encoding="jsonParsed",
             program=PUMP_FUN_PROGRAM  # 只监听Pump.fun程序的区块
         )
 
