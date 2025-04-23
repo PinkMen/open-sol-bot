@@ -190,9 +190,15 @@ class TransactionDetailSubscriber:
                     if "ping" in response_dict:
                         logger.debug(f"Got ping response: {response_dict}")
                     if "filters" in response_dict and "transaction" in response_dict:
-                        if "transaction" in response_dict["transaction"] and "index" in response_dict["transaction"]["transaction"] and response_dict["transaction"]["transaction"]["index"] <200:
-                            logger.debug(f"Got transaction response: \n {response_dict}")
-                            await self._process_transaction(response_dict["transaction"])
+                        transaction_data = response_dict["transaction"]
+                        if "transaction" in transaction_data:
+                            tx_info = transaction_data["transaction"]
+                            # 检查交易索引是否存在且小于200，避免处理过多数据
+                            if "index" in tx_info and tx_info["index"] < 200:
+                                logger.debug(f"Processing transaction: {tx_info['signature']}")
+                                await self._process_transaction(transaction_data)
+                            else:
+                                logger.debug(f"Skipping transaction with index {tx_info.get('index')}")
                         #logger.debug(f"Got transaction response: \n {response_dict}")
                         #await self._process_transaction(response_dict["transaction"])
                 except Exception as e:
