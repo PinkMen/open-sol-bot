@@ -22,7 +22,8 @@ from yellowstone_grpc.types import (
     SubscribeRequest,
     SubscribeRequestFilterTransactions,
     SubscribeRequestPing,
-    CommitmentLevel
+    CommitmentLevel,
+    SubscribeRequestFilterSlots
 )
 
 from wallet_tracker.constants import NEW_TX_DETAIL_CHANNEL
@@ -243,6 +244,9 @@ class TransactionDetailSubscriber:
             params = {}
             params['ping'] = SubscribeRequestPing(id=1)
             params["commitment"] = CommitmentLevel.PROCESSED
+            params['slots'] = SubscribeRequestFilterSlots(
+                filter_by_commitment=True
+            )
             subscribe_request = SubscribeRequest(**params)
             pb_request = Parse(subscribe_request.model_dump_json(), geyser_pb2.SubscribeRequest())
 
