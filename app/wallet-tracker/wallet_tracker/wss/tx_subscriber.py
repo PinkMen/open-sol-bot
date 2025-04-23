@@ -168,7 +168,7 @@ class TransactionDetailSubscriber:
 
         async def _f():
             try:
-                await self.pump_monitor.start()
+                #await self.pump_monitor.start()
                 # 启动日志订阅
                 await self.account_log_monitor.start()
                 
