@@ -5,7 +5,7 @@
 
 import asyncio
 from typing import Optional
-
+import traceback
 import aioredis
 from solana.rpc.websocket_api import connect
 from solbot_common.config import settings
@@ -123,6 +123,7 @@ class PumpMonitor:
                             break
                         except Exception as e:
                             logger.error(f"Error processing message: {e}")
+                            traceback.print_exc()
                             break
             except Exception as e:
                 logger.error(f"Error in monitor loop: {e}")
