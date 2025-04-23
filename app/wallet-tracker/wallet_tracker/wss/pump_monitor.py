@@ -112,7 +112,7 @@ class PumpMonitor:
                                 messages = [messages]
                                 
                             for message in messages:
-                                logger.info(f"received message: {message}")
+                                #logger.info(f"received message: {message}")
                                 if isinstance(message, SubscriptionResult):
                                     self.subscription_id = message.result
                                     logger.info(f"Subscribed with ID: {self.subscription_id}")
