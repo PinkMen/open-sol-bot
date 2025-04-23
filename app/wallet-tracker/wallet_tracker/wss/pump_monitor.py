@@ -110,12 +110,12 @@ class PumpMonitor:
                                 messages = [messages]
                                 
                             for message in messages:
-                                #logger.info(f"received message: {message}")
-                                if isinstance(message, SubscriptionResult):
-                                    self.subscription_id = message.result
-                                    logger.info(f"Subscribed with ID: {self.subscription_id}")
-                                elif isinstance(message, ProgramNotification):
-                                    await self.process_block_event(message)
+                                logger.info(f"received message: {message}")
+                                # if isinstance(message, SubscriptionResult):
+                                #     self.subscription_id = message.result
+                                #     logger.info(f"Subscribed with ID: {self.subscription_id}")
+                                # elif isinstance(message, ProgramNotification):
+                                #     await self.process_block_event(message)
                         except (ConnectionClosedError, ConnectionClosedOK) as e:
                             logger.warning(f"WebSocket connection closed: {e}")
                             break
