@@ -190,8 +190,11 @@ class TransactionDetailSubscriber:
                     if "ping" in response_dict:
                         logger.debug(f"Got ping response: {response_dict}")
                     if "filters" in response_dict and "transaction" in response_dict:
-                        logger.debug(f"Got transaction response: \n {response_dict}")
-                        await self._process_transaction(response_dict["transaction"])
+                        if "transaction" in response_dict["transaction"] and "index" in response_dict["transaction"]["transaction"] and response_dict["transaction"]["transaction"]["index"] <200:
+                            logger.debug(f"Got transaction response: \n {response_dict}")
+                            await self._process_transaction(response_dict["transaction"])
+                        #logger.debug(f"Got transaction response: \n {response_dict}")
+                        #await self._process_transaction(response_dict["transaction"])
                 except Exception as e:
                     logger.error(f"Error processing response: {e}")
                     logger.exception(e)
