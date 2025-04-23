@@ -244,10 +244,10 @@ class TransactionDetailSubscriber:
             params = {}
             params['ping'] = SubscribeRequestPing(id=1)
             params["commitment"] = CommitmentLevel.PROCESSED
-            params['slots'] = {
-                "filter":SubscribeRequestFilterSlots(
-                    filter_by_commitment=True
-            )}
+            # params['slots'] = {
+            #     "filter":SubscribeRequestFilterSlots(
+            #         filter_by_commitment=True
+            # )}
             subscribe_request = SubscribeRequest(**params)
             pb_request = Parse(subscribe_request.model_dump_json(), geyser_pb2.SubscribeRequest())
 
