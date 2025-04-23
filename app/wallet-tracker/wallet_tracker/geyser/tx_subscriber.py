@@ -242,9 +242,7 @@ class TransactionDetailSubscriber:
             # Create subscription request
             params = {}
             params['ping'] = SubscribeRequestPing(id=1)
-            params["transactions"] = {
-                "commitment":CommitmentLevel.PROCESSED
-            }
+            params["commitment"] = CommitmentLevel.PROCESSED
             subscribe_request = SubscribeRequest(**params)
             pb_request = Parse(subscribe_request.model_dump_json(), geyser_pb2.SubscribeRequest())
 
