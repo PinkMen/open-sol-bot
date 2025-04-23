@@ -96,7 +96,7 @@ class PumpMonitor:
                     self.websocket = websocket
                     logger.info(f"Connected to Solana WebSocket RPC: {self.websocket_url}")
                     
-                    await self.websocket.program_subscribe(
+                    await self.websocket.logs_subscribe(
                         program_id=PUMP_FUN_PROGRAM,  # 只监听Pump.fun程序的区块
                         commitment="confirmed",
                         encoding="base64",
