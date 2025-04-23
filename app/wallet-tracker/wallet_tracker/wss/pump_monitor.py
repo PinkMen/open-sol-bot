@@ -107,8 +107,11 @@ class PumpMonitor:
                     while self.is_running:
                         try:
                             messages = await websocket.recv()
+                            logger.info(f"received message: {messages}")
                             for message in messages:
-                                 logger.info(f"received message: {message}")
+                                if not isinstance(message, ProgramNotification):
+                                    continue
+                                
                                 # if isinstance(message, SubscriptionResult):
                                 #     self.subscription_id = message.result
                                 #     logger.info(f"Subscribed to blocks with ID: {self.subscription_id}")
