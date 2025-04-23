@@ -194,7 +194,7 @@ class TransactionDetailSubscriber:
                         if "transaction" in transaction_data:
                             tx_info = transaction_data["transaction"]
                             # 检查交易索引是否存在且小于200，避免处理过多数据
-                            if "index" in tx_info and int(tx_info["index"]) < 200:
+                            if "index" in tx_info and int(tx_info["index"]) < 10:
                                 logger.debug(f"Processing transaction: {tx_info['signature']}")
                                 await self._process_transaction(transaction_data)
                             else:
