@@ -88,7 +88,7 @@ class PumpMonitor:
         while self.is_running:
             try:
                 async with connect(
-                    self.pumpfun_url,
+                    self.websocket_url,
                     ping_timeout=30,
                     ping_interval=20,
                     close_timeout=20,
@@ -96,12 +96,10 @@ class PumpMonitor:
                     self.websocket = websocket
                     logger.info(f"Connected to Solana WebSocket RPC: {self.websocket_url}")
                     
-                    await self.websocket.logs_subscribe(
+                    await self.websocket.program_subscribe(
                         program_id=PUMP_FUN_PROGRAM,  # 只监听Pump.fun程序的区块
                         commitment="confirmed",
                         encoding="base64",
-                     
-                        
                     )
 
                     while self.is_running:
