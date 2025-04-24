@@ -4,6 +4,7 @@ import time
 from collections.abc import AsyncGenerator, Sequence
 
 import aioredis
+from app.trading.trading import transaction
 import base58
 import orjson as json
 from google.protobuf.json_format import (
@@ -191,10 +192,16 @@ class TransactionDetailSubscriber:
                     if "ping" in response_dict:
                         logger.debug(f"Got ping response: {response_dict}")
                     if "filters" in response_dict and "transaction" in response_dict:
+                        transaction = response_dict["transaction"]
+                        if "transaction" in transaction:
+                            tx = transaction["transaction"]
+                            if "meta" in tx:
+                                # 检查是否是初始化mint2交易
+                                if "InitializeMint2" in tx["meta"]["logMessages"]:
+                                    logger.debug(f"Got transaction response InitializeMint2:")
+                                    await self._process_transaction(transaction)
+                    
                         logger.debug(f"Got transaction response: \n {response_dict}")
-                    if any("InitializeMint2" in str(value) for value in response_dict.values()):
-                        logger.debug(f"Got transaction response InitializeMint2:")
-                        #await self._process_transaction(response_dict["transaction"])
                 except Exception as e:
                     logger.error(f"Error processing response: {e}")
                     logger.exception(e)
