@@ -91,7 +91,6 @@ class TransactionWorker:
                         continue
                 _, tx_detail = result
                 json_data = json.loads(tx_detail)
-                logger.info(f"get the redis tx: {json_data}")
                 await self.process_transaction(json_data)
             except RedisError as e:
                 logger.error(f"Failed to push transaction to Redis: {e}")

@@ -28,8 +28,8 @@ class RawTXParser(TransactionParserInterface):
     @cache
     def get_tx_hash(self) -> str:
         txs = self.tx_detail["transaction"]["signatures"]
-        if len(txs) > 1:
-            raise ValueError("multiple txs in one transaction")
+        #if len(txs) > 1:
+            #raise ValueError("multiple txs in one transaction")
         return txs[0]
 
     @cache
