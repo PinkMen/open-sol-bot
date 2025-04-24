@@ -147,7 +147,7 @@ class TransactionDetailSubscriber:
                     vote=False
                 )
             }
-            params['commitment'] = CommitmentLevel.CONFIRMED
+            params['commitment'] = CommitmentLevel.PROCESSED
         else:
             params["ping"] = SubscribeRequestPing(id=1)
 
