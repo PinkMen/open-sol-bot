@@ -142,7 +142,7 @@ class TransactionDetailSubscriber:
 
         if len(self.subscribed_wallets) != 0:
             params["transactions"] = {
-                "key": SubscribeRequestFilterTransactions(
+                "pump_subscription": SubscribeRequestFilterTransactions(
                     account_include=list(self.subscribed_wallets),
                     failed=False,
                     vote=False
@@ -214,7 +214,7 @@ class TransactionDetailSubscriber:
                     if "ping" in response_dict:
                         logger.debug(f"Got ping response: {response_dict}")
                     if "filters" in response_dict and "transaction" in response_dict:
-                        logger.debug(f"Got transaction response: \n {response_dict}")
+                        #logger.debug(f"Got transaction response: \n {response_dict}")
                         await self._process_transaction(response_dict['transaction'])
                 except Exception as e:
                     logger.error(f"Error processing response: {e}")
