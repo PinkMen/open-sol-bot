@@ -191,15 +191,9 @@ class TransactionDetailSubscriber:
                     if "ping" in response_dict:
                         logger.debug(f"Got ping response: {response_dict}")
                     if "filters" in response_dict and "transaction" in response_dict:
-                        transaction = response_dict["transaction"]
-                        if "transaction" in transaction:
-                            tx = transaction["transaction"]
-                            if "meta" in tx:
-                                # 检查是否是初始化mint2交易
-                                if "InitializeMint2" in tx["meta"]["logMessages"]:
-                                    logger.debug(f"Got transaction response InitializeMint2:")
-                                    await self._process_transaction(transaction)
-                    
+                        if any('InitializeMint2' in str(msg) for msg in response_dict.get('transaction', {}).get('meta', {}).get('logMessages', [])):
+                            logger.debug(f"Got transaction response InitializeMint2:")
+                            await self._process_transaction(response_dict['transaction'])
                         logger.debug(f"Got transaction response: \n {response_dict}")
                 except Exception as e:
                     logger.error(f"Error processing response: {e}")
