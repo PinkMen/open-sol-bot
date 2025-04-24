@@ -191,10 +191,10 @@ class TransactionDetailSubscriber:
                     if "ping" in response_dict:
                         logger.debug(f"Got ping response: {response_dict}")
                     if "filters" in response_dict and "transaction" in response_dict:
-                        if any('InitializeImmutableOwner' in str(msg) for msg in response_dict.get('transaction', {}).get('transaction',{}).get('meta', {}).get('logMessages', [])):
-                            logger.debug(f"Got transaction response InitializeMint2:")
+                        if any('InitializeMint2' in str(msg) for msg in response_dict.get('transaction', {}).get('transaction',{}).get('meta', {}).get('logMessages', [])):
+                            logger.debug(f"Got transaction response: \n {response_dict}")
                             await self._process_transaction(response_dict['transaction'])
-                        #logger.debug(f"Got transaction response: \n {response_dict}")
+                        
                 except Exception as e:
                     logger.error(f"Error processing response: {e}")
                     logger.exception(e)
