@@ -195,8 +195,8 @@ class TransactionDetailSubscriber:
             if any('InitializeMint2' in str(msg) for msg in logmessages):
                 logger.info(f"Found InitializeMint2 in transaction {tx_info_json}")
                 await self.redis.lpush(NEW_PUMP_TOKEN_CHANNEL, tx_info_json)
-            else:
-                await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
+            #else:
+                #await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             # 保持列表长度在合理范围内（比如最多保留1000条交易记录）
             # await self.redis.ltrim(NEW_TX_DETAIL_CHANNEL, 0, 999)
             logger.info(f"Added transaction '{signature}' to queue")
