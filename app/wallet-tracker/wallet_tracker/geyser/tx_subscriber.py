@@ -25,7 +25,7 @@ from yellowstone_grpc.types import (
     CommitmentLevel,
 )
 
-from wallet_tracker.constants import NEW_TX_DETAIL_CHANNEL
+from wallet_tracker.constants import NEW_TX_DETAIL_CHANNEL ,NEW_PUMP_TOKEN_CHANNEL
 
 
 def should_convert_to_base58(value) -> bool:
@@ -93,7 +93,7 @@ class TransactionDetailSubscriber:
         self.response_queue = asyncio.Queue(maxsize=1000)
         self.worker_nums = 2
         self.workers: list[asyncio.Task] = []
-        self.channel = NEW_TX_DETAIL_CHANNEL
+
 
     async def _connect(self) -> None:
         """Connect to Geyser service with retry mechanism."""
@@ -155,6 +155,24 @@ class TransactionDetailSubscriber:
         subscribe_request = SubscribeRequest(**params)
         return subscribe_request
 
+    def __build_pump_subscribe_request(self) -> SubscribeRequest:
+        logger.info(f"Subscribing to accounts: {self.subscribed_wallets}")
+        params = {}
+        if len(self.subscribed_wallets) != 0:
+            params["transactions"] = {
+                "pump_subscription": SubscribeRequestFilterTransactions(
+                    account_include=list(self.subscribed_wallets),
+                    failed=False,
+                    vote=False
+                )
+            }
+            params['commitment'] = CommitmentLevel.PROCESSED
+        else:
+            params["ping"] = SubscribeRequestPing(id=1)
+
+        subscribe_request = SubscribeRequest(**params)
+        return subscribe_request
+
     async def _process_transaction(self, transaction: dict) -> None:
         """Process and store transaction in Redis."""
         if self.redis is None:
@@ -170,11 +188,15 @@ class TransactionDetailSubscriber:
             data["version"] = 0
             # 只有被确认之后才会有 blockTime, 所以这里设置为当前时间
             data["blockTime"] = int(time.time())
-
+            logmessages = transaction["transaction"]["meta"]["logMessages"]
             tx_info_json = json.dumps(data)
             # Store in Redis using LIST structure
             # 将交易信息添加到列表左端（最新的交易在最前面）
-            await self.redis.lpush(self.channel, tx_info_json)
+            if any('InitializeMint2' in str(msg) for msg in logmessages):
+                logger.info(f"Found InitializeMint2 in transaction {tx_info_json}")
+                await self.redis.lpush(NEW_PUMP_TOKEN_CHANNEL, tx_info_json)
+            else:
+                await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             # 保持列表长度在合理范围内（比如最多保留1000条交易记录）
             # await self.redis.ltrim(NEW_TX_DETAIL_CHANNEL, 0, 999)
             logger.info(f"Added transaction '{signature}' to queue")
