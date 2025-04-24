@@ -147,6 +147,7 @@ class TransactionDetailSubscriber:
                     failed=False,
                 )
             }
+            params['commitment'] = CommitmentLevel.PROCESSED
         else:
             params["ping"] = SubscribeRequestPing(id=1)
 
@@ -189,9 +190,11 @@ class TransactionDetailSubscriber:
                     response_dict = proto_to_dict(response)
                     if "ping" in response_dict:
                         logger.debug(f"Got ping response: {response_dict}")
-                    if "InitializeMint2" in response_dict:
+                    if "filters" in response_dict and "transactions" in response_dict:
                         logger.debug(f"Got transaction response: \n {response_dict}")
-                        await self._process_transaction(response_dict["transaction"])
+                    if "InitializeMint2" in response_dict:
+                        logger.debug(f"Got transaction response InitializeMint2:")
+                        #await self._process_transaction(response_dict["transaction"])
                 except Exception as e:
                     logger.error(f"Error processing response: {e}")
                     logger.exception(e)
@@ -240,10 +243,11 @@ class TransactionDetailSubscriber:
             if self.geyser_client is None:
                 raise Exception("Geyser client is not connected")
 
-            # Create subscription request
-            params = {}
-            params['ping'] = SubscribeRequestPing(id=1)
-            params["commitment"] = CommitmentLevel.PROCESSED
+            # 创建订阅请求
+            params = {
+                'ping': SubscribeRequestPing(id=1),
+            }
+            subscribe_request = SubscribeRequest(**params)
             # params['slots'] = {
             #     "filter":SubscribeRequestFilterSlots(
             #         filter_by_commitment=True
