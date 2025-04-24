@@ -23,7 +23,6 @@ from yellowstone_grpc.types import (
     SubscribeRequestFilterTransactions,
     SubscribeRequestPing,
     CommitmentLevel,
-    SubscribeRequestFilterSlots
 )
 
 from wallet_tracker.constants import NEW_TX_DETAIL_CHANNEL
@@ -147,7 +146,7 @@ class TransactionDetailSubscriber:
                     failed=False,
                 )
             }
-            params['commitment'] = CommitmentLevel.PROCESSED
+            params['commitment'] = CommitmentLevel.CONFIRMED
         else:
             params["ping"] = SubscribeRequestPing(id=1)
 
