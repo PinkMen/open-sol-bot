@@ -11,7 +11,8 @@ from solders.pubkey import Pubkey  # type: ignore
 
 from .geyser.tx_subscriber import TransactionDetailSubscriber as GeyserMonitor
 from .wss.tx_subscriber import TransactionDetailSubscriber as RPCMonitor
-
+from .geyser.pump_subscriber import NewMintSubscriber as PumpMonitor
+from solbot_common.constants import PUMP_FUN_PROGRAM
 
 class TxMonitor:
     def __init__(
@@ -35,6 +36,13 @@ class TxMonitor:
                 redis,
                 wallets,
             )
+            
+            self.pump_monitor = PumpMonitor(
+                settings.rpc.geyser.endpoint,
+                settings.rpc.geyser.api_key,
+                redis,
+                [Pubkey.from_string(PUMP_FUN_PROGRAM)],
+            )
         else:
             raise ValueError("Invalid mode")
 
@@ -51,6 +59,7 @@ class TxMonitor:
 
         # 启动监听器
         await self.monitor.start()
+        await self.pump_monitor.start()
 
         # 从数据库中获取已激活的目标地址
         monitor_addresses = await Monitor.get_active_wallet_addresses()
@@ -61,6 +70,7 @@ class TxMonitor:
             await self.monitor.subscribe_wallet_transactions(Pubkey.from_string(address))
             logger.debug(f"Subscribed to wallet: {address}")
 
+        await self.pump_monitor.subscribe_wallet_transactions(Pubkey.from_string(PUMP_FUN_PROGRAM))
         # 开始处理事件
         logger.info("Start processing monitor events")
         while True:
@@ -76,12 +86,14 @@ class TxMonitor:
         """停止监听器"""
         await self.events.unsubscribe()
         await self.monitor.stop()
+        await self.pump_monitor.stop()
 
     async def _handle_resume_event(self, event: MonitorEvent):
         """处理恢复监听事件"""
         try:
             wallet = Pubkey.from_string(event.target_wallet)
             await self.monitor.subscribe_wallet_transactions(wallet)
+            await self.pump_monitor.subscribe_wallet_transactions(wallet)
             logger.info(f"Resumed monitoring wallet: {wallet}")
         except Exception as e:
             logger.error(f"Failed to resume monitoring wallet {event.target_wallet}: {e}")
@@ -92,6 +104,7 @@ class TxMonitor:
         try:
             wallet = Pubkey.from_string(event.target_wallet)
             await self.monitor.unsubscribe_wallet_transactions(wallet)
+            await self.pump_monitor.unsubscribe_wallet_transactions(wallet)
             logger.info(f"Paused monitoring wallet: {wallet}")
         except Exception as e:
             logger.error(f"Failed to pause monitoring wallet {event.target_wallet}: {e}")

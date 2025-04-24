@@ -12,3 +12,5 @@ FAILED_TX_EVENT_CHANNEL = "tx_event:failed"
 
 NEW_PUMP_TOKEN_CHANNEL= "rpc:tx_signature:new"
 FAILED_PUMP_SIGNATURE_CHANNEL = "rpc:tx_signature:failed"
+
+NEW_MINT_DETAIL_CHANNEL = "pump_new_mint:new"

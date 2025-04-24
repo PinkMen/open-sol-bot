@@ -93,6 +93,7 @@ class TransactionDetailSubscriber:
         self.response_queue = asyncio.Queue(maxsize=1000)
         self.worker_nums = 2
         self.workers: list[asyncio.Task] = []
+        self.channel = NEW_TX_DETAIL_CHANNEL
 
     async def _connect(self) -> None:
         """Connect to Geyser service with retry mechanism."""
@@ -141,7 +142,7 @@ class TransactionDetailSubscriber:
 
         if len(self.subscribed_wallets) != 0:
             params["transactions"] = {
-                "pump_subscription": SubscribeRequestFilterTransactions(
+                "key": SubscribeRequestFilterTransactions(
                     account_include=list(self.subscribed_wallets),
                     failed=False,
                     vote=False
@@ -173,7 +174,7 @@ class TransactionDetailSubscriber:
             tx_info_json = json.dumps(data)
             # Store in Redis using LIST structure
             # 将交易信息添加到列表左端（最新的交易在最前面）
-            await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
+            await self.redis.lpush(self.channel, tx_info_json)
             # 保持列表长度在合理范围内（比如最多保留1000条交易记录）
             # await self.redis.ltrim(NEW_TX_DETAIL_CHANNEL, 0, 999)
             logger.info(f"Added transaction '{signature}' to queue")
@@ -191,10 +192,8 @@ class TransactionDetailSubscriber:
                     if "ping" in response_dict:
                         logger.debug(f"Got ping response: {response_dict}")
                     if "filters" in response_dict and "transaction" in response_dict:
-                        if any('InitializeMint2' in str(msg) for msg in response_dict.get('transaction', {}).get('transaction',{}).get('meta', {}).get('logMessages', [])):
-                            logger.debug(f"Got transaction response: \n {response_dict}")
-                            await self._process_transaction(response_dict['transaction'])
-                        
+                        logger.debug(f"Got transaction response: \n {response_dict}")
+                        await self._process_transaction(response_dict['transaction'])
                 except Exception as e:
                     logger.error(f"Error processing response: {e}")
                     logger.exception(e)
