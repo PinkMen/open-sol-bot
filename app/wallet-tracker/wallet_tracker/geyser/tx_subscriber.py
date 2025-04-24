@@ -190,9 +190,9 @@ class TransactionDetailSubscriber:
                     response_dict = proto_to_dict(response)
                     if "ping" in response_dict:
                         logger.debug(f"Got ping response: {response_dict}")
-                    if "filters" in response_dict and "transactions" in response_dict:
+                    if "filters" in response_dict and "transaction" in response_dict:
                         logger.debug(f"Got transaction response: \n {response_dict}")
-                    if "InitializeMint2" in response_dict:
+                    if any("InitializeMint2" in str(value) for value in response_dict.values()):
                         logger.debug(f"Got transaction response InitializeMint2:")
                         #await self._process_transaction(response_dict["transaction"])
                 except Exception as e:
