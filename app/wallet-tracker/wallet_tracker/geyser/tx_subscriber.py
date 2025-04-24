@@ -141,9 +141,10 @@ class TransactionDetailSubscriber:
 
         if len(self.subscribed_wallets) != 0:
             params["transactions"] = {
-                "key": SubscribeRequestFilterTransactions(
+                "pump_subscription": SubscribeRequestFilterTransactions(
                     account_include=list(self.subscribed_wallets),
                     failed=False,
+                    vote=False
                 )
             }
             params['commitment'] = CommitmentLevel.CONFIRMED
