@@ -41,7 +41,7 @@ class TxMonitor:
                 settings.rpc.geyser.endpoint,
                 settings.rpc.geyser.api_key,
                 redis,
-                [Pubkey.from_string(PUMP_FUN_PROGRAM)],
+                [PUMP_FUN_PROGRAM],
             )
         else:
             raise ValueError("Invalid mode")
@@ -70,7 +70,7 @@ class TxMonitor:
             await self.monitor.subscribe_wallet_transactions(Pubkey.from_string(address))
             logger.debug(f"Subscribed to wallet: {address}")
 
-        await self.pump_monitor.subscribe_wallet_transactions(Pubkey.from_string(PUMP_FUN_PROGRAM))
+        await self.pump_monitor.subscribe_wallet_transactions(PUMP_FUN_PROGRAM)
         # 开始处理事件
         logger.info("Start processing monitor events")
         while True:
