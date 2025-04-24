@@ -58,10 +58,10 @@ class TxMonitor:
         copytrade_addresses = await CopyTradeService.get_active_wallet_addresses()
         # 合并两个列表
         active_wallet_addresses = list(set(list(monitor_addresses) + list(copytrade_addresses)))
-        active_wallet_addresses.append(PUMP_FUN_PROGRAM)
         for address in active_wallet_addresses:
             await self.monitor.subscribe_wallet_transactions(Pubkey.from_string(address))
             logger.debug(f"Subscribed to wallet: {address}")
+        await self.monitor.subscribe_wallet_transactions(PUMP_FUN_PROGRAM)
         # 开始处理事件
         logger.info("Start processing monitor events")
         while True:
