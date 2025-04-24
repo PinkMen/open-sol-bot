@@ -4,7 +4,6 @@ import time
 from collections.abc import AsyncGenerator, Sequence
 
 import aioredis
-from app.trading.trading import transaction
 import base58
 import orjson as json
 from google.protobuf.json_format import (
