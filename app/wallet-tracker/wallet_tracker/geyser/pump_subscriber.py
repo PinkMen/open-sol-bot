@@ -26,7 +26,7 @@ from yellowstone_grpc.types import (
 )
 
 from wallet_tracker.constants import NEW_MINT_DETAIL_CHANNEL
-from tx_subscriber import TransactionDetailSubscriber
+from .tx_subscriber import TransactionDetailSubscriber
 
 def should_convert_to_base58(value) -> bool:
     """Check if bytes should be converted to base58."""
@@ -77,6 +77,7 @@ class NewMintSubscriber(TransactionDetailSubscriber):
         wallets: Sequence[Pubkey],
     ):
         super().__init__(endpoint, api_key, redis_client, wallets)
+        self.channel = NEW_MINT_DETAIL_CHANNEL
     
     def __build_subscribe_request(self) -> SubscribeRequest:
         logger.info(f"Subscribing to accounts: {self.subscribed_wallets}")
