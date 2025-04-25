@@ -58,8 +58,7 @@ class TransactionWorker:
                 # 加入到失败队列
                 await self.push_parse_failed_to_redis(tx_detail_text)
                 return
-            logger.info(f"Tx event success XXXXXXXXXXX: {tx_event}")
-            #await self.tx_event_producer.produce(tx_event)
+            await self.tx_event_producer.produce(tx_event)
             logger.success(f"New tx event: {tx_hash}")
         except TransactionError as e:
             logger.info(f"Transaction status is not valid, status: {e}")
