@@ -167,7 +167,7 @@ class PumpfunNewMintParser(TransactionParserInterface):
             to_decimals=to_decimals,
             mint=mint,
             tx_type=tx_type,
-            tx_direction="buy" if sol_amount_change["change_amount"] < 0 else "sell",
+            tx_direction="buy",
             timestamp=timestamp,
             pre_token_amount=pre_token_balance,
             post_token_amount=post_token_balance,
