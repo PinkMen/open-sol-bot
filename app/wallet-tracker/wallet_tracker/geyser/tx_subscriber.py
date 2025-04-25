@@ -26,7 +26,7 @@ from yellowstone_grpc.types import (
 )
 
 from wallet_tracker.constants import NEW_TX_DETAIL_CHANNEL ,NEW_MINT_DETAIL_CHANNEL
-
+from solbot_common.constants import PUMP_FUN_MINT_AUTHORITY
 
 def should_convert_to_base58(value) -> bool:
     """Check if bytes should be converted to base58."""
@@ -143,7 +143,8 @@ class TransactionDetailSubscriber:
         if len(self.subscribed_wallets) != 0:
             params["transactions"] = {
                 "pump_subscription": SubscribeRequestFilterTransactions(
-                    account_include=list(self.subscribed_wallets),
+                    #account_include=list(self.subscribed_wallets),
+                    account_required=[self.subscribed_wallets,PUMP_FUN_MINT_AUTHORITY],
                     failed=False,
                     vote=False
                 )
@@ -192,14 +193,14 @@ class TransactionDetailSubscriber:
             tx_info_json = json.dumps(data)
             # Store in Redis using LIST structure
             # 将交易信息添加到列表左端（最新的交易在最前面）
-            if any('InitializeMint2' in str(msg) for msg in logmessages):
-                logger.info(f"Found InitializeMint2 in transaction {tx_info_json}")
-                await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
+            #if any('InitializeMint2' in str(msg) for msg in logmessages):
+            logger.info(f"Added transaction '{signature} \n {tx_info_json}' to queue")
+            await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             #else:
                 #await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             # 保持列表长度在合理范围内（比如最多保留1000条交易记录）
             # await self.redis.ltrim(NEW_TX_DETAIL_CHANNEL, 0, 999)
-            #logger.info(f"Added transaction '{signature}' to queue")
+            
         except Exception as e:
             logger.exception(f"Error processing transaction: {e}")
 

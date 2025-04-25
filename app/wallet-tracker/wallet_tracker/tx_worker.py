@@ -14,8 +14,7 @@ from wallet_tracker.exceptions import (
     UnknownTransactionType,
     ZeroChangeAmountError,
 )
-from wallet_tracker.parser import RawTXParser
-from wallet_tracker.parser import PumpTxParser
+from wallet_tracker.parser import RawTXParser ,PumpfunNewMintParser
 
 class TransactionWorker:
     """
@@ -41,7 +40,7 @@ class TransactionWorker:
 
     async def process_transaction(self, tx_detail: dict):
         """处理单个交易"""
-        tx_parser = PumpTxParser(tx_detail)
+        tx_parser = PumpfunNewMintParser(tx_detail)
         tx_hash = tx_parser.get_tx_hash()
 
         # 使用 orjson 的 dumps，它返回 bytes，需要解码为 str
@@ -59,7 +58,8 @@ class TransactionWorker:
                 # 加入到失败队列
                 await self.push_parse_failed_to_redis(tx_detail_text)
                 return
-            await self.tx_event_producer.produce(tx_event)
+            logger.info(f"Tx event success XXXXXXXXXXX: {tx_event}")
+            #await self.tx_event_producer.produce(tx_event)
             logger.success(f"New tx event: {tx_hash}")
         except TransactionError as e:
             logger.info(f"Transaction status is not valid, status: {e}")

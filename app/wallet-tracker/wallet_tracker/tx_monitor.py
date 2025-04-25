@@ -61,7 +61,7 @@ class TxMonitor:
         for address in active_wallet_addresses:
             await self.monitor.subscribe_wallet_transactions(Pubkey.from_string(address))
             logger.debug(f"Subscribed to wallet: {address}")
-        await self.monitor.subscribe_wallet_transactions(PUMP_FUN_PROGRAM)
+        #await self.monitor.subscribe_wallet_transactions(PUMP_FUN_PROGRAM)
         # 开始处理事件
         logger.info("Start processing monitor events")
         while True:
