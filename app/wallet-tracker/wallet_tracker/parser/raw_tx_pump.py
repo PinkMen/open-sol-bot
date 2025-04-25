@@ -1,7 +1,7 @@
 from functools import cache
 
 import orjson as json
-from solbot_common.constants import SWAP_PROGRAMS, TOKEN_PROGRAM_ID, WSOL
+from solbot_common.constants import SWAP_PROGRAMS, TOKEN_PROGRAM_ID, WSOL ,PUMP_FUN_PROGRAM_ID
 from solbot_common.types import SolAmountChange, TokenAmountChange, TxEvent, TxType
 
 from wallet_tracker.exceptions import (
@@ -160,14 +160,14 @@ class PumpfunNewMintParser(TransactionParserInterface):
 
         return TxEvent(
             signature=signature,
-            who=who,
+            who=PUMP_FUN_PROGRAM_ID,
             from_amount=from_amount,
             from_decimals=from_decimals,
             to_amount=to_amount,
             to_decimals=to_decimals,
             mint=mint,
             tx_type=tx_type,
-            tx_direction="buy",
+            tx_direction="buy" ,
             timestamp=timestamp,
             pre_token_amount=pre_token_balance,
             post_token_amount=post_token_balance,
