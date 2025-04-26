@@ -85,15 +85,25 @@ class BondingCurveAccount:
         try:
             if len(buffer) == 48:
                 (
-                discriminator,
-                virtual_token_reserves,
-                virtual_sol_reserves,
-                real_token_reserves,
-                real_sol_reserves,
-                token_total_supply,
-            ) = struct.unpack("<QQQQQQ", buffer)
-            else:
-                    
+                    discriminator,
+                    virtual_token_reserves,
+                    virtual_sol_reserves,
+                    real_token_reserves,
+                    real_sol_reserves,
+                    token_total_supply,
+                    complete,
+                ) = struct.unpack("<QQQQQQ", buffer)
+            elif len(buffer) == 49:
+                (
+                    discriminator,
+                    virtual_token_reserves,
+                    virtual_sol_reserves,
+                    real_token_reserves,
+                    real_sol_reserves,
+                    token_total_supply,
+                    complete
+                ) = struct.unpack("<QQQQQQ?", buffer)
+            else: 
                 (
                     discriminator,
                     virtual_token_reserves,
@@ -102,7 +112,8 @@ class BondingCurveAccount:
                     real_sol_reserves,
                     token_total_supply,
                     complete,
-                ) = struct.unpack("<QQQQQQ?", buffer)
+                    meta
+                ) = struct.unpack("<QQQQQQ?I60s", buffer)
 
             return cls(
                 discriminator=discriminator,
@@ -114,4 +125,4 @@ class BondingCurveAccount:
                 complete=complete,
             )
         except struct.error as e:
-            raise ValueError(f"Failed to decode buffer: {e}")
+            raise ValueError(f"Failed to decode buffer: {e} ,{len(buffer)}")
