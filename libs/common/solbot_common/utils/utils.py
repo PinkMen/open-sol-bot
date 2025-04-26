@@ -32,7 +32,7 @@ async def get_bonding_curve_account(
         return None
     value = account_info.value
     if value is None:
-        logger.debug(f"Failed to fetch bonding curve account value: {bonding_curve}")
+        logger.debug(f"Failed to fetch bonding curve account value: {account_info}")
         return None
     bonding_curve_account = BondingCurveAccount.from_buffer(bytes(value.data))
     return (bonding_curve, associated_bonding_curve, bonding_curve_account)
