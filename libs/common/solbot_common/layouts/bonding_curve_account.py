@@ -83,7 +83,7 @@ class BondingCurveAccount:
         ?: boolean (1 byte)
         """
         try:
-            if len(buffer) > 49
+            if len(buffer) > 49:
                buffer =  buffer[:49]
             
             if len(buffer) == 48:
