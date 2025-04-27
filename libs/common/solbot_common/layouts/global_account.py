@@ -40,6 +40,8 @@ class GlobalAccount:
         32s: 32 bytes for Pubkey
         """
         try:
+            if len(buffer) > 113:
+                buffer = buffer[:113]
             # 解包数据
             (
                 discriminator,

@@ -16,13 +16,12 @@ class GlobalAccountCache:
         self.prefix = "global_account"
 
     async def _get(self, program: Pubkey) -> bytes | None:
-        for seed in [b"global", b"state", b"config", b"pump"]:
-            pda, bump = Pubkey.find_program_address([seed], program)
-            response = await  self.celient.get_account_info_json_parsed(pda)
-            logger.debug(f"got result:{seed}:{response}")
+        # for seed in [b"global", b"state", b"config", b"pump"]:
+        #     pda, bump = Pubkey.find_program_address([seed], program)
+        #     response = await  self.celient.get_account_info_json_parsed(pda)
+        #     logger.debug(f"got result:{seed}:{response}")
         global_account_pda = Pubkey.find_program_address([b"global"], program)[0]
         token_account = await self.celient.get_account_info_json_parsed(global_account_pda,commitment="confirmed")
-        logger.debug(f"get global account: {token_account}")
         if token_account is None:
             return None
         value = token_account.value
