@@ -392,7 +392,15 @@ class TransactionDetailSubscriber:
         subscribe_request = self.__build_subscribe_request()
         json_str = subscribe_request.model_dump_json()
         pb_request = Parse(json_str, geyser_pb2.SubscribeRequest())
-        await self.request_queue.put(pb_request)
+        #await self.request_queue.put(pb_request)
+         # Subscribe to updates
+        if self.geyser_client is None:
+            raise RuntimeError("Geyser client is not connected")
+        logger.info("Subscribing to account updates...")
+        (
+            self.request_queue,
+            self.responses,
+        ) = await self.geyser_client.subscribe_with_request(pb_request)
 
 
 if __name__ == "__main__":
