@@ -69,7 +69,7 @@ class GlobalAccount:
                 fee_basis_points=fee_basis_points,
             )
         except struct.error as e:
-            raise ValueError(f"Failed to decode buffer: {e}")
+            raise ValueError(f"Failed to decode buffer: {e} ,{buffer} ,{len(buffer)}")
 
     def __post_init__(self):
         """

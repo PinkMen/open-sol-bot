@@ -27,7 +27,6 @@ async def get_bonding_curve_account(
     associated_bonding_curve = get_associated_token_address(bonding_curve, mint)
 
     account_info = await client.get_account_info_json_parsed(bonding_curve,commitment="confirmed")
-    logger.debug(f"fetch bonding curve account value: {account_info}")
     if account_info is None:
         logger.debug(f"Failed to fetch bonding curve account: {bonding_curve}")
         return None
