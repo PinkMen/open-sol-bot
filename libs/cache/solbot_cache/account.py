@@ -1,5 +1,7 @@
 import base64
 
+from asyncio.streams import logger
+
 import orjson as json
 from solana.rpc.async_api import AsyncClient
 from solbot_common.layouts.global_account import GlobalAccount
@@ -14,8 +16,9 @@ class GlobalAccountCache:
         self.prefix = "global_account"
 
     async def _get(self, program: Pubkey) -> bytes | None:
-        global_account_pda = Pubkey.find_program_address([b"pump"], program)[0]
-        token_account = await self.celient.get_account_info_json_parsed(global_account_pda)
+        global_account_pda = Pubkey.find_program_address([b"global"], program)[0]
+        token_account = await self.celient.get_account_info_json_parsed(global_account_pda,commitment="confirmed")
+        logger.debug(f"get global account: {token_account}")
         if token_account is None:
             return None
         value = token_account.value
