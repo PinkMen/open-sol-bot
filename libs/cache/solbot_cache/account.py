@@ -14,7 +14,7 @@ class GlobalAccountCache:
         self.prefix = "global_account"
 
     async def _get(self, program: Pubkey) -> bytes | None:
-        global_account_pda = Pubkey.find_program_address([b"global"], program)[0]
+        global_account_pda = Pubkey.find_program_address([b"pump"], program)[0]
         token_account = await self.celient.get_account_info_json_parsed(global_account_pda)
         if token_account is None:
             return None
