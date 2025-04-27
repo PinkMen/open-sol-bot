@@ -396,11 +396,18 @@ class TransactionDetailSubscriber:
          # Subscribe to updates
         if self.geyser_client is None:
             raise RuntimeError("Geyser client is not connected")
-        logger.info("Subscribing to account updates...")
-        (
-            self.request_queue,
-            self.responses,
-        ) = await self.geyser_client.subscribe_with_request(pb_request)
+        
+        # 关闭旧流
+        if self.responses:
+            try:
+                await self.responses.aclose()
+                logger.debug("Closed old response stream")
+            except Exception as e:
+                logger.warning(f"Error closing old stream: {e}")
+
+        # 重新订阅
+        logger.info(f"Resubscribing with wallets: {self.subscribed_wallets}")
+        self.request_queue, self.responses = await self.geyser_client.subscribe_with_request(pb_request)
 
 
 if __name__ == "__main__":
