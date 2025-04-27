@@ -196,8 +196,9 @@ class TransactionDetailSubscriber:
             # Store in Redis using LIST structure
             # 将交易信息添加到列表左端（最新的交易在最前面）
             #if any('InitializeMint2' in str(msg) for msg in logmessages):
-            #logger.info(f"Added transaction '{signature} \n {tx_info_json}' to queue")
-            await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
+            logger.info(f"Added transaction '{signature} \n {tx_info_json}' to queue")
+
+            #await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             #else:
                 #await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             # 保持列表长度在合理范围内（比如最多保留1000条交易记录）
