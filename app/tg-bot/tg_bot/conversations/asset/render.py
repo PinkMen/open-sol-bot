@@ -18,7 +18,7 @@ async def render(wallet: str):
     text = render_asset_message(
         wallet=wallet,
         sol_balance=sol_balance,
-        tokens=tokens,
+        tokens=tokens[-50:],
     )
 
     return {
