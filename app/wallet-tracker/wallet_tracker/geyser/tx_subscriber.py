@@ -23,6 +23,7 @@ from yellowstone_grpc.types import (
     SubscribeRequestFilterTransactions,
     SubscribeRequestPing,
     CommitmentLevel,
+    SubscribeUpdate
 )
 
 from wallet_tracker.constants import NEW_TX_DETAIL_CHANNEL ,NEW_MINT_DETAIL_CHANNEL
@@ -154,7 +155,6 @@ class TransactionDetailSubscriber:
             params['commitment'] = CommitmentLevel.CONFIRMED
         else:
             params["ping"] = SubscribeRequestPing(id=1)
-        logger.info(f"Subscribing params: {params}")
         subscribe_request = SubscribeRequest(**params)
         return subscribe_request
 
@@ -369,6 +369,9 @@ class TransactionDetailSubscriber:
 
         # 从订阅集合中移除钱包
         self.subscribed_wallets.remove(str(wallet))
+        if len(self.subscribed_wallets) == 0:
+            await self._reconnect_and_subscribe()
+            return
 
         # 发送新的订阅请求，只包含剩余的钱包
         # 这个请求会完全替换服务器端之前的订阅状态
