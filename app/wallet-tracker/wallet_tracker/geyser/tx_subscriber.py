@@ -335,7 +335,8 @@ class TransactionDetailSubscriber:
             wallet (Pubkey): 要订阅的钱包地址
         """
         if self.request_queue is None:
-            #raise Exception("Request queue is not initialized")
+            raise Exception("Request queue is not initialized")
+        if self.is_running == False:
             await self.start()
 
         if str(wallet) in self.subscribed_wallets:
