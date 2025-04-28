@@ -144,7 +144,7 @@ class TransactionDetailSubscriber:
             account_required = list(self.subscribed_wallets)
             #account_required.append(PUMP_FUN_MINT_AUTHORITY)
             params["transactions"] = {
-                "pump_subscription": SubscribeRequestFilterTransactions(
+                "key": SubscribeRequestFilterTransactions(
                     #account_include=list(self.subscribed_wallets),
                     account_required= account_required,
                     failed=False,
