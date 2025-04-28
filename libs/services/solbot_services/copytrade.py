@@ -15,7 +15,7 @@ class CopyTradeService:
         """ "获取指定目标钱包的活跃跟单"""
         stmt = select(CopyTrade).where(
             CopyTrade.target_wallet == target_wallet
-        ).where(CopyTrade.active == True)
+        ).where(CopyTrade.active == 1)
         results = await session.execute(stmt)
         return [row.model_copy() for row in results.scalars().all()]
 
