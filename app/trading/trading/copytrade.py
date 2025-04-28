@@ -48,6 +48,7 @@ class CopyTradeProcessor:
         """处理交易事件"""
         logger.info(f"Processing tx event: {tx_event}")
         copytrade_items = await self.copytrade_service.get_by_target_wallet(tx_event.who)
+        logger.debug(f"Found copytrade items: {copytrade_items} ")
         swap_mode = "ExactIn" if tx_event.tx_direction == "buy" else "ExactOut"
         # buy_pct = 0
         sell_pct = 0
