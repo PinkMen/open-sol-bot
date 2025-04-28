@@ -335,7 +335,8 @@ class TransactionDetailSubscriber:
             wallet (Pubkey): 要订阅的钱包地址
         """
         if self.request_queue is None:
-            raise Exception("Request queue is not initialized")
+            #raise Exception("Request queue is not initialized")
+            await self.start()
 
         if str(wallet) in self.subscribed_wallets:
             logger.warning(f"Wallet {wallet} already subscribed")
@@ -370,7 +371,7 @@ class TransactionDetailSubscriber:
         # 从订阅集合中移除钱包
         self.subscribed_wallets.remove(str(wallet))
         if len(self.subscribed_wallets) == 0:
-            await self._reconnect_and_subscribe()
+            await self.stop()
             return
 
         # 发送新的订阅请求，只包含剩余的钱包
