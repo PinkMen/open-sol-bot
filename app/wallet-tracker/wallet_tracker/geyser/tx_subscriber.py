@@ -144,7 +144,7 @@ class TransactionDetailSubscriber:
             account_required = list(self.subscribed_wallets)
             #account_required.append(PUMP_FUN_MINT_AUTHORITY)
             params["transactions"] = {
-                "key": SubscribeRequestFilterTransactions(
+                "pump_subscription": SubscribeRequestFilterTransactions(
                     #account_include=list(self.subscribed_wallets),
                     account_required= account_required,
                     failed=False,
@@ -153,8 +153,12 @@ class TransactionDetailSubscriber:
             }
             params['commitment'] = CommitmentLevel.CONFIRMED
         else:
+            params["transactions"] = {
+                "pump_subscription": SubscribeRequestFilterTransactions(
+                    account_required= [],
+                )
+            }
             params["ping"] = SubscribeRequestPing(id=1)
-            params["transactions"]={}
         logger.info(f"Subscribing params: {params}")
         subscribe_request = SubscribeRequest(**params)
         return subscribe_request
