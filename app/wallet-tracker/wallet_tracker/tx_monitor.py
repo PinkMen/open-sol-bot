@@ -11,8 +11,6 @@ from solders.pubkey import Pubkey  # type: ignore
 
 from .geyser.tx_subscriber import TransactionDetailSubscriber as GeyserMonitor
 from .wss.tx_subscriber import TransactionDetailSubscriber as RPCMonitor
-from .geyser.pump_subscriber import NewMintSubscriber as PumpMonitor
-from solbot_common.constants import PUMP_FUN_PROGRAM
 
 class TxMonitor:
     def __init__(
@@ -93,6 +91,9 @@ class TxMonitor:
         try:
             wallet = Pubkey.from_string(event.target_wallet)
             await self.monitor.unsubscribe_wallet_transactions(wallet)
+            if len(self.monitor.subscribed_wallets) == 0:
+                await self.monitor.stop()
+
             logger.info(f"Paused monitoring wallet: {wallet}")
         except Exception as e:
             logger.error(f"Failed to pause monitoring wallet {event.target_wallet}: {e}")

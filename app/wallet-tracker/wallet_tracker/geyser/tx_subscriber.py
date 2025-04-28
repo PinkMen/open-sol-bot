@@ -153,11 +153,6 @@ class TransactionDetailSubscriber:
             }
             params['commitment'] = CommitmentLevel.CONFIRMED
         else:
-            params["transactions"] = {
-                "pump_subscription": SubscribeRequestFilterTransactions(
-                    account_required= [],
-                )
-            }
             params["ping"] = SubscribeRequestPing(id=1)
         logger.info(f"Subscribing params: {params}")
         subscribe_request = SubscribeRequest(**params)
