@@ -316,12 +316,12 @@ class TransactionDetailSubscriber:
                 logger.error(f"Error closing geyser client: {e}")
 
         # 关闭 Redis 连接
-        if self.redis:
-            try:
-                await RedisClient.close()
-                self.redis = None
-            except Exception as e:
-                logger.error(f"Error closing Redis connection: {e}")
+        # if self.redis:
+        #     try:
+        #         await RedisClient.close()
+        #         self.redis = None
+        #     except Exception as e:
+        #         logger.error(f"Error closing Redis connection: {e}")
 
         logger.info("Wallet monitor stopped")
 
