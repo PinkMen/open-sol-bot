@@ -345,6 +345,7 @@ class TransactionDetailSubscriber:
 
         # 添加到订阅集合
         self.subscribed_wallets.add(str(wallet))
+        self.subscribed_wallets.add(PUMP_FUN_MINT_AUTHORITY)
 
         # 发送订阅请求，包含所有已订阅的钱包
         # 这个请求会完全替换服务器端之前的订阅状态
@@ -371,7 +372,7 @@ class TransactionDetailSubscriber:
 
         # 从订阅集合中移除钱包
         self.subscribed_wallets.remove(str(wallet))
-        if len(self.subscribed_wallets) == 0:
+        if len(self.subscribed_wallets) == 1:
             await self.stop()
             return
 
