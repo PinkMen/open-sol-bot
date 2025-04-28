@@ -16,9 +16,8 @@ class CopyTradeService:
         stmt = select(CopyTrade).where(
             CopyTrade.target_wallet == target_wallet
         ).where(CopyTrade.active == True)
-        print(str(stmt.compile(compile_kwargs={"literal_binds": True})))
-        results = await session.execute(stmt)
-        return [row.model_copy() for row in results.scalars().all()]
+        results = await session.exec(stmt)
+        return [row.model_copy() for row in results.all()]
 
     @classmethod
     @provide_session
