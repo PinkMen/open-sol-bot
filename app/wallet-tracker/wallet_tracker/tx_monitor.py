@@ -92,7 +92,7 @@ class TxMonitor:
             wallet = Pubkey.from_string(event.target_wallet)
             await self.monitor.unsubscribe_wallet_transactions(wallet)
             if len(self.monitor.subscribed_wallets) == 0:
-                await self.monitor.stop()
+                await self.stop()
 
             logger.info(f"Paused monitoring wallet: {wallet}")
         except Exception as e:
