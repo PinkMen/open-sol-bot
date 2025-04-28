@@ -274,6 +274,7 @@ class TransactionDetailSubscriber:
                 logger.info(f"Starting response worker {id(asyncio.current_task())}")
 
                 while self.is_running:
+                    logger.info(f"request_queue :{self.request_queue}")
                     try:
                         async for response in self.responses:
                             if not self.is_running:
