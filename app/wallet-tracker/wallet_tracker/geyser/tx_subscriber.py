@@ -154,25 +154,8 @@ class TransactionDetailSubscriber:
             params['commitment'] = CommitmentLevel.CONFIRMED
         else:
             params["ping"] = SubscribeRequestPing(id=1)
+            params["transactions"]={}
         logger.info(f"Subscribing params: {params}")
-        subscribe_request = SubscribeRequest(**params)
-        return subscribe_request
-
-    def __build_pump_subscribe_request(self) -> SubscribeRequest:
-        logger.info(f"Subscribing to accounts: {self.subscribed_wallets}")
-        params = {}
-        if len(self.subscribed_wallets) != 0:
-            params["transactions"] = {
-                "pump_subscription": SubscribeRequestFilterTransactions(
-                    account_include=list(self.subscribed_wallets),
-                    failed=False,
-                    vote=False
-                )
-            }
-            params['commitment'] = CommitmentLevel.PROCESSED
-        else:
-            params["ping"] = SubscribeRequestPing(id=1)
-
         subscribe_request = SubscribeRequest(**params)
         return subscribe_request
 
@@ -392,14 +375,7 @@ class TransactionDetailSubscriber:
         subscribe_request = self.__build_subscribe_request()
         json_str = subscribe_request.model_dump_json()
         pb_request = Parse(json_str, geyser_pb2.SubscribeRequest())
-        #await self.request_queue.put(pb_request)
-         # Subscribe to updates
-        if self.geyser_client is None:
-            raise RuntimeError("Geyser client is not connected")
-
-        # 重新订阅
-        logger.info(f"Resubscribing with wallets: {self.subscribed_wallets}")
-        self.request_queue, self.responses = await self.geyser_client.subscribe_with_request(pb_request)
+        await self.request_queue.put(pb_request)
 
 
 if __name__ == "__main__":
