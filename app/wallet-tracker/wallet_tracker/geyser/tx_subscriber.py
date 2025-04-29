@@ -345,7 +345,7 @@ class TransactionDetailSubscriber:
 
         # 添加到订阅集合
         self.subscribed_wallets.add(str(wallet))
-        self.subscribed_wallets.add("TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM")
+        #self.subscribed_wallets.add("TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM")
 
         # 发送订阅请求，包含所有已订阅的钱包
         # 这个请求会完全替换服务器端之前的订阅状态

@@ -88,11 +88,19 @@ def create_copytrade_keyboard(udata: CopyTrade) -> InlineKeyboardMarkup:
                     ),
                     callback_data="toggle_auto_follow",
                 ),
+                # InlineKeyboardButton(
+                #     text="{} 止盈止损".format(
+                #         "✅" if udata.stop_loss else "",
+                #     ),
+                #     callback_data="toggle_take_profile_and_stop_loss",
+                # ),
                 InlineKeyboardButton(
-                    text="{} 止盈止损".format(
-                        "✅" if udata.stop_loss else "",
-                    ),
-                    callback_data="toggle_take_profile_and_stop_loss",
+                    text="设置止盈比例",
+                    callback_data="set_take_profit_ratio",
+                ),
+                InlineKeyboardButton(
+                    text="设置止损比例",
+                    callback_data="set_stop_loss_ratio",
                 ),
                 InlineKeyboardButton(
                     text="{} 只跟买入".format(
@@ -181,6 +189,14 @@ def edit_copytrade_keyboard(udata: CopyTrade) -> InlineKeyboardMarkup:
                         "✅" if udata.stop_loss else "",
                     ),
                     callback_data="toggle_take_profile_and_stop_loss",
+                ),
+                InlineKeyboardButton(
+                    text="设置止盈比例",
+                    callback_data="set_take_profit_ratio",
+                ),
+                InlineKeyboardButton(
+                    text="设置止损比例",
+                    callback_data="set_stop_loss_ratio",
                 ),
                 InlineKeyboardButton(
                     text="{} 只跟买入".format(
