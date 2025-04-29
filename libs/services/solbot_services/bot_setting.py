@@ -18,7 +18,11 @@ class BotSettingService:
     async def get(self, chat_id: int, wallet_address: str) -> BotSetting | None:
         data = await self.redis.get(f"setting:{chat_id}:{wallet_address}")
         if data is None:
-            return None
+            await self.create_default(chat_id, wallet_address)
+            return BotSetting(
+                wallet_address=wallet_address,
+                chat_id=chat_id,
+            )
         return BotSetting.from_json(data)
 
     async def set(self, setting: BotSetting):
