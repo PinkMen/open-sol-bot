@@ -94,6 +94,7 @@ class TransactionDetailSubscriber:
         self.response_queue = asyncio.Queue(maxsize=1000)
         self.worker_nums = 2
         self.workers: list[asyncio.Task] = []
+        self.mints = {str(PUMP_FUN_MINT_AUTHORITY)}
 
 
     async def _connect(self) -> None:
@@ -142,12 +143,10 @@ class TransactionDetailSubscriber:
         params = {}
 
         if len(self.subscribed_wallets) != 0:
-            account_required = list(self.subscribed_wallets)
-            #account_required.append(PUMP_FUN_MINT_AUTHORITY)
             params["transactions"] = {
                 "pump_subscription": SubscribeRequestFilterTransactions(
-                    #account_include=list(self.subscribed_wallets),
-                    account_required= account_required,
+                    account_include = list(self.mints),
+                    account_required= list(self.subscribed_wallets),
                     failed=False,
                     vote=False
                 )
@@ -177,10 +176,11 @@ class TransactionDetailSubscriber:
             tx_info_json = json.dumps(data)
             # Store in Redis using LIST structure
             # 将交易信息添加到列表左端（最新的交易在最前面）
-            #if any('InitializeMint2' in str(msg) for msg in logmessages):
-            logger.info(f"Added transaction '{signature} \n {tx_info_json}' to queue")
+            #new created
+            if any('InitializeMint2' in str(msg) for msg in logmessages):
+                logger.info(f"Added transaction '{signature} \n {tx_info_json}' to queue")
 
-            await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
+            #await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             #else:
                 #await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             # 保持列表长度在合理范围内（比如最多保留1000条交易记录）
@@ -345,7 +345,6 @@ class TransactionDetailSubscriber:
 
         # 添加到订阅集合
         self.subscribed_wallets.add(str(wallet))
-        #self.subscribed_wallets.add("TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM")
 
         # 发送订阅请求，包含所有已订阅的钱包
         # 这个请求会完全替换服务器端之前的订阅状态
@@ -377,6 +376,29 @@ class TransactionDetailSubscriber:
             return
 
         # 发送新的订阅请求，只包含剩余的钱包
+        # 这个请求会完全替换服务器端之前的订阅状态
+        subscribe_request = self.__build_subscribe_request()
+        json_str = subscribe_request.model_dump_json()
+        pb_request = Parse(json_str, geyser_pb2.SubscribeRequest())
+        await self.request_queue.put(pb_request)
+    
+    async def subscribe_mint_transactions(self, mints: list[str]) -> None:
+        """订阅钱包的交易信息。
+
+        每次发送新的订阅请求都会完全替换之前的订阅状态。
+        这是 Geyser API 的设计：它使用 gRPC 的双向流，每个新请求都会更新整个订阅列表。
+
+        Args:
+            mints (Pubkey): 要订阅的货币地址    
+        """
+        if self.request_queue is None:
+            raise Exception("Request queue is not initialized")
+        if self.is_running == False:
+            await self.start()
+
+        # 添加到订阅集合
+        self.mints.update(mints)
+        # 发送订阅请求，包含所有已订阅的钱包
         # 这个请求会完全替换服务器端之前的订阅状态
         subscribe_request = self.__build_subscribe_request()
         json_str = subscribe_request.model_dump_json()

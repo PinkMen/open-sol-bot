@@ -7,6 +7,7 @@ from solbot_common.log import logger
 from solbot_common.models.tg_bot.monitor import Monitor
 from solbot_db.redis import RedisClient
 from solbot_services.copytrade import CopyTradeService
+from solbot_services.swaprecord import SwapRecordService
 from solders.pubkey import Pubkey  # type: ignore
 
 from .geyser.tx_subscriber import TransactionDetailSubscriber as GeyserMonitor
@@ -59,7 +60,10 @@ class TxMonitor:
         for address in active_wallet_addresses:
             await self.monitor.subscribe_wallet_transactions(Pubkey.from_string(address))
             logger.debug(f"Subscribed to wallet: {address}")
-        #await self.monitor.subscribe_wallet_transactions(PUMP_FUN_PROGRAM)
+        #数据库查出已购买的mint地址进行监控
+        mint_addresses = await SwapRecordService.get_active_mint_addresses()
+        await self.monitor.subscribe_mint_transactions(list(mint_addresses))
+        logger.debug(f"Subscribed to mints: {mint_addresses}")
         # 开始处理事件
         logger.info("Start processing monitor events")
         while True:
