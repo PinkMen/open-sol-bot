@@ -63,7 +63,6 @@ class TxMonitor:
         #数据库查出已购买的mint地址进行监控
         mint_addresses = await SwapRecordService.get_active_mint_addresses()
         await self.monitor.subscribe_mint_transactions(list(mint_addresses))
-        logger.debug(f"Subscribed to mints: {mint_addresses}")
         # 开始处理事件
         logger.info("Start processing monitor events")
         while True:
