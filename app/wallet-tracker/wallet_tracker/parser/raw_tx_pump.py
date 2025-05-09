@@ -18,7 +18,7 @@ from solbot_common.constants import (
     PUMP_FUN_PROGRAM
 )
 from solbot_services.swaprecord import SwapRecordService
-
+from solders.pubkey import Pubkey  # type: ignore
 class PumpfunNewMintParser(TransactionParserInterface):
     def __init__(self, tx_detail: dict) -> None:
         self.tx_detail = tx_detail
@@ -130,8 +130,8 @@ class PumpfunNewMintParser(TransactionParserInterface):
         #     raise ZeroChangeAmountError(pre_balance, post_balance)
     async def get_mint_price(self, mint: str) -> float:
         # 这里可以根据mint地址查询价格
-        # 这里只是一个示例，实际情况需要根据具体的API或数据源来实现
         # 这里假设mint地址为"mint_address"的价格为1.0
+        mint = Pubkey.from_string(mint)
         result = await get_bonding_curve_account(get_async_client(), mint, PUMP_FUN_PROGRAM)
         if result is None:
             raise Exception("bonding curve account not found")
@@ -149,7 +149,6 @@ class PumpfunNewMintParser(TransactionParserInterface):
 
     async def needClosePotision(self) -> bool:
         # 检查是否需要关闭仓位
-        # 这里只是一个示例，实际情况需要根据具体的API或数据源来实现
         # 这里假设需要关闭仓位的条件是价格变化超过10%
         mint = self.get_mint()
         new_price = await self.get_mint_price(mint) 

@@ -154,7 +154,7 @@ class TransactionDetailSubscriber:
             params['commitment'] = CommitmentLevel.CONFIRMED
         else:
             params["ping"] = SubscribeRequestPing(id=1)
-        logger.info(f"Subscribing to accounts: {params}")
+        #logger.info(f"Subscribing to accounts: {params}")
         subscribe_request = SubscribeRequest(**params)
         return subscribe_request
 
