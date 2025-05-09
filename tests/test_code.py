@@ -1,4 +1,5 @@
 from re import S
+import re
 import asyncio ,time
 
 
@@ -53,9 +54,8 @@ def test(*args):
 if __name__ == "__main__":
     #task = Async()
     try:
-        json = set()
-        json.update([1,2,3])
-        print(json)
+        result = 30120425528 / 1068710001364596
+        print (f"{result:.9f}")
         #asyncio.run(task.start())
     except KeyboardInterrupt:
         print("程序被手动终止了")
