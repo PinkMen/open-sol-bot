@@ -21,3 +21,12 @@ class SwapRecordService:
         stmt = select(SwapRecord.output_mint).where(SwapRecord.status == TransactionStatus.SUCCESS).distinct()
         result = await session.execute(stmt)
         return result.scalars().all()
+
+    @classmethod
+    @provide_session
+    async def get_mint(
+        cls, mint:str,*, session: AsyncSession = NEW_ASYNC_SESSION
+    ) -> SwapRecord | None:
+        stmt = select(SwapRecord).where(SwapRecord.status == TransactionStatus.SUCCESS and SwapRecord.output_mint == mint)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()

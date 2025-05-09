@@ -53,10 +53,14 @@ def test(*args):
 if __name__ == "__main__":
     #task = Async()
     try:
-        a = {"liu"}
-        b = {"jun"}
-        a |= b
-        print(a ,b ,a.update(b))
+        json = {
+            "Alice": 1,
+            "Bob": 2,
+            "Charlie": 3
+        }
+        if 'Bob' in json:
+
+            print("dd")
         #asyncio.run(task.start())
     except KeyboardInterrupt:
         print("程序被手动终止了")

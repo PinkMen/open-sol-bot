@@ -1,9 +1,11 @@
 from functools import cache
 
+from solbot_common.log import logger
+
 import orjson as json
 from solbot_common.constants import SWAP_PROGRAMS, TOKEN_PROGRAM_ID, WSOL ,PUMP_FUN_PROGRAM_ID
 from solbot_common.types import SolAmountChange, TokenAmountChange, TxEvent, TxType
-
+from solbot_common.utils.utils import get_bonding_curve_account
 from wallet_tracker.exceptions import (
     NotSwapTransaction,
     UnknownTransactionType,
@@ -11,7 +13,11 @@ from wallet_tracker.exceptions import (
 )
 
 from .protocol import TransactionParserInterface
-
+from solbot_common.utils.utils import get_async_client
+from solbot_common.constants import (
+    PUMP_FUN_PROGRAM
+)
+from solbot_services.swaprecord import SwapRecordService
 
 class PumpfunNewMintParser(TransactionParserInterface):
     def __init__(self, tx_detail: dict) -> None:
@@ -66,6 +72,12 @@ class PumpfunNewMintParser(TransactionParserInterface):
                 decimals = post_token_balance["uiTokenAmount"]["decimals"]
                 break
 
+        if "preTokenBalances" in self.tx_detail["meta"]:
+            for pre_token_balance in self.tx_detail["meta"]["preTokenBalances"]:
+                if pre_token_balance["mint"] == mint and pre_token_balance["owner"] == who:
+                    pre_token_amount = int(pre_token_balance["uiTokenAmount"]["amount"])
+                    break
+
         return {
             "change_amount": post_token_amount - pre_token_amount,
             "decimals": decimals,
@@ -91,29 +103,61 @@ class PumpfunNewMintParser(TransactionParserInterface):
 
     @cache
     def get_tx_type(self) -> TxType:
+        # 检查是否是开仓或清仓交易
         token_amount_change = self.get_token_amount_change()
-        change_ui_amount = token_amount_change["change_amount"] / (
-            10 ** token_amount_change["decimals"]
+        return TxType.OPEN_POSITION if token_amount_change['pre_balance'] == 0 else TxType.CLOSE_POSITION
+        # change_ui_amount = token_amount_change["change_amount"] / (
+        #     10 ** token_amount_change["decimals"]
+        # )
+        # pre_balance = token_amount_change["pre_balance"] / (10 ** token_amount_change["decimals"])
+        # post_balance = token_amount_change["post_balance"] / (10 ** token_amount_change["decimals"])
+        # if change_ui_amount > 0:
+        #     # 加仓或开仓
+        #     if pre_balance == 0 and post_balance > 0:
+        #         return TxType.OPEN_POSITION
+        #     elif post_balance > pre_balance:
+        #         return TxType.ADD_POSITION
+        #     else:
+        #         raise UnknownTransactionType()
+        # elif change_ui_amount < 0:
+        #     if pre_balance > 0 and post_balance < 0.001:
+        #         return TxType.CLOSE_POSITION
+        #     elif post_balance < pre_balance:
+        #         return TxType.REDUCE_POSITION
+        #     else:
+        #         raise UnknownTransactionType()
+        # else:
+        #     raise ZeroChangeAmountError(pre_balance, post_balance)
+    async def get_mint_price(self, mint: str) -> float:
+        # 这里可以根据mint地址查询价格
+        # 这里只是一个示例，实际情况需要根据具体的API或数据源来实现
+        # 这里假设mint地址为"mint_address"的价格为1.0
+        result = await get_bonding_curve_account(get_async_client(), mint, PUMP_FUN_PROGRAM)
+        if result is None:
+            raise Exception("bonding curve account not found")
+        bonding_curve, associated_bonding_curve, bonding_curve_account = result
+        logger.info(f"get mint price {result}")
+        # 价格 = SOL / 代币
+        return (
+            bonding_curve_account.virtual_sol_reserves
+            / bonding_curve_account.virtual_token_reserves
+            / 1000
         )
-        pre_balance = token_amount_change["pre_balance"] / (10 ** token_amount_change["decimals"])
-        post_balance = token_amount_change["post_balance"] / (10 ** token_amount_change["decimals"])
-        if change_ui_amount > 0:
-            # 加仓或开仓
-            if pre_balance == 0 and post_balance > 0:
-                return TxType.OPEN_POSITION
-            elif post_balance > pre_balance:
-                return TxType.ADD_POSITION
-            else:
-                raise UnknownTransactionType()
-        elif change_ui_amount < 0:
-            if pre_balance > 0 and post_balance < 0.001:
-                return TxType.CLOSE_POSITION
-            elif post_balance < pre_balance:
-                return TxType.REDUCE_POSITION
-            else:
-                raise UnknownTransactionType()
-        else:
-            raise ZeroChangeAmountError(pre_balance, post_balance)
+
+    def calculate_price_change(self,new_price: float, old_price: float) -> float:
+        return ((new_price - old_price) / old_price) * 100
+
+    async def needClosePotision(self) -> bool:
+        # 检查是否需要关闭仓位
+        # 这里只是一个示例，实际情况需要根据具体的API或数据源来实现
+        # 这里假设需要关闭仓位的条件是价格变化超过10%
+        mint = self.get_mint()
+        new_price = await self.get_mint_price(mint) 
+        createMint = await SwapRecordService().get_mint(mint)
+        logger.info(f"get create mint: {createMint}")
+        oldPrice = createMint.input_amount / createMint.output_amount
+        price_change = self.calculate_price_change(new_price, oldPrice)
+        return abs(price_change) > 10
 
     @cache
     def get_swap_program_id(self) -> str | None:
@@ -125,7 +169,7 @@ class PumpfunNewMintParser(TransactionParserInterface):
         return None
 
     @cache
-    def parse(self) -> TxEvent | None:
+    async def parse(self) -> TxEvent | None:
         # if self.tx_detail["meta"]["status"] is not None:
         #     if "Err" in self.tx_detail["meta"]["status"]:
         #         raise TransactionError(str(self.tx_detail["meta"]["status"]["Err"]))
@@ -151,6 +195,8 @@ class PumpfunNewMintParser(TransactionParserInterface):
             pre_token_balance = token_amount_change["pre_balance"]
             post_token_balance = token_amount_change["post_balance"]
         else:
+            if not await self.needClosePotision():
+                raise NotSwapTransaction()
             from_amount = abs(token_amount_change["change_amount"])
             from_decimals = token_amount_change["decimals"]
             to_amount = abs(sol_amount_change["change_amount"])
@@ -167,7 +213,7 @@ class PumpfunNewMintParser(TransactionParserInterface):
             to_decimals=to_decimals,
             mint=mint,
             tx_type=tx_type,
-            tx_direction="buy" ,
+            tx_direction="buy" if tx_type  == TxType.OPEN_POSITION  else "sell",
             timestamp=timestamp,
             pre_token_amount=pre_token_balance,
             post_token_amount=post_token_balance,

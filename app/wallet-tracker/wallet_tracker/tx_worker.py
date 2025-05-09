@@ -50,7 +50,7 @@ class TransactionWorker:
             await benchmark.record_block_time(tx_hash, block_time)
 
             async with benchmark.with_parse_tx(tx_hash):
-                tx_event = tx_parser.parse()
+                tx_event = await tx_parser.parse()
 
             # FIXME: 解析失败，该如何处理, 后续需要对失败队列加入监控并发出警报
             if tx_event is None:

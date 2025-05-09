@@ -94,7 +94,7 @@ class TransactionDetailSubscriber:
         self.response_queue = asyncio.Queue(maxsize=1000)
         self.worker_nums = 2
         self.workers: list[asyncio.Task] = []
-        self.mints = {str(PUMP_FUN_MINT_AUTHORITY)}
+        self.mints = {}#str(PUMP_FUN_MINT_AUTHORITY)
 
 
     async def _connect(self) -> None:
@@ -177,12 +177,12 @@ class TransactionDetailSubscriber:
             # Store in Redis using LIST structure
             # 将交易信息添加到列表左端（最新的交易在最前面）
             #new created
-            if any('InitializeMint2' in str(msg) for msg in logmessages):
-                #logger.info(f"Added transaction '{signature} \n {tx_info_json}' to queue")
-                return
-            else:
-                logger.info(f"Added mint '{signature} \n {tx_info_json}' to queue")
-            #await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
+            # if any('InitializeMint2' in str(msg) for msg in logmessages):
+            #     #logger.info(f"Added transaction '{signature} \n {tx_info_json}' to queue")
+            #     return
+            # else:
+            #     logger.info(f"Added mint '{signature} \n {tx_info_json}' to queue")
+            await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             #else:
                 #await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             # 保持列表长度在合理范围内（比如最多保留1000条交易记录）
