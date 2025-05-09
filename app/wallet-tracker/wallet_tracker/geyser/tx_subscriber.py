@@ -154,6 +154,7 @@ class TransactionDetailSubscriber:
             params['commitment'] = CommitmentLevel.CONFIRMED
         else:
             params["ping"] = SubscribeRequestPing(id=1)
+        logger.info(f"Subscribing to accounts: {params}")
         subscribe_request = SubscribeRequest(**params)
         return subscribe_request
 
@@ -181,7 +182,7 @@ class TransactionDetailSubscriber:
             #     #logger.info(f"Added transaction '{signature} \n {tx_info_json}' to queue")
             #     return
             # else:
-            #     logger.info(f"Added mint '{signature} \n {tx_info_json}' to queue")
+            logger.info(f"Added mint '{signature} \n {tx_info_json}' to queue")
             await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
             #else:
                 #await self.redis.lpush(NEW_TX_DETAIL_CHANNEL, tx_info_json)
