@@ -151,7 +151,7 @@ class TransactionDetailSubscriber:
                     vote=False
                 )
             }
-            params['commitment'] = CommitmentLevel.PROCESS
+            params['commitment'] = CommitmentLevel.PROCESSED
         else:
             params["ping"] = SubscribeRequestPing(id=1)
         #logger.info(f"Subscribing to accounts: {params}")
