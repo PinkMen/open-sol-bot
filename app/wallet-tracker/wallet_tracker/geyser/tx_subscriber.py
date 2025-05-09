@@ -94,7 +94,7 @@ class TransactionDetailSubscriber:
         self.response_queue = asyncio.Queue(maxsize=1000)
         self.worker_nums = 2
         self.workers: list[asyncio.Task] = []
-        self.mints = {}#str(PUMP_FUN_MINT_AUTHORITY)
+        self.mints = set()#str(PUMP_FUN_MINT_AUTHORITY)
 
 
     async def _connect(self) -> None:
