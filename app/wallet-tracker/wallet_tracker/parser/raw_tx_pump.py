@@ -104,8 +104,8 @@ class PumpfunNewMintParser(TransactionParserInterface):
     @cache
     def get_tx_type(self) -> TxType:
         # 检查是否是开仓或清仓交易
-        token_amount_change = self.get_token_amount_change()
-        return TxType.OPEN_POSITION if token_amount_change['pre_balance'] == 0 else TxType.CLOSE_POSITION
+        logmessages = self.tx_detail["meta"]["logMessages"]
+        return TxType.OPEN_POSITION if any('InitializeMint2' in str(msg) for msg in logmessages) else TxType.CLOSE_POSITION
         # change_ui_amount = token_amount_change["change_amount"] / (
         #     10 ** token_amount_change["decimals"]
         # )

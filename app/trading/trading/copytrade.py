@@ -107,6 +107,7 @@ class CopyTradeProcessor:
             return
 
         try:
+            raise ValueError(f"stop copytrade {tx_event}")
             # 根据不同的根据设置，创建不同的 swap_event
             setting = await self.setting_service.get(copytrade.chat_id, copytrade.owner)
             if setting is None:
