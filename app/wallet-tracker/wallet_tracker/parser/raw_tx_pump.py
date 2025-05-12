@@ -141,7 +141,6 @@ class PumpfunNewMintParser(TransactionParserInterface):
         return (
             bonding_curve_account.virtual_sol_reserves
             / bonding_curve_account.virtual_token_reserves
-            / 1000
         )
 
     def calculate_price_change(self,new_price: float, old_price: float) -> float:
@@ -153,6 +152,8 @@ class PumpfunNewMintParser(TransactionParserInterface):
         mint = self.get_mint()
         new_price = await self.get_mint_price(mint) 
         createMint = await SwapRecordService().get_mint(mint = mint)
+        if createMint is None:
+            raise Exception("create mint not found")
         logger.info(f"get create mint: {createMint}")
         oldPrice = createMint.input_amount / createMint.output_amount
         price_change = self.calculate_price_change(new_price, oldPrice)
