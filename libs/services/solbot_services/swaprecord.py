@@ -27,6 +27,6 @@ class SwapRecordService:
     async def get_mint(
         cls, mint:str ,session :AsyncSession
     ) -> SwapRecord | None:
-        stmt = select(SwapRecord).where(SwapRecord.status == TransactionStatus.SUCCESS).where(SwapRecord.output_mint == mint).limit(1)
+        stmt = select(SwapRecord).where(SwapRecord.status == TransactionStatus.SUCCESS, SwapRecord.output_mint == mint).limit(1)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
