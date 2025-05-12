@@ -25,7 +25,7 @@ class SwapRecordService:
     @classmethod
     @provide_session
     async def get_mint(
-        cls, mint:str,*, session: AsyncSession = NEW_ASYNC_SESSION
+        cls, mint:str ,session :AsyncSession
     ) -> SwapRecord | None:
         stmt = select(SwapRecord).where(SwapRecord.status == TransactionStatus.SUCCESS and SwapRecord.output_mint == mint).limit(1)
         result = await session.execute(stmt)

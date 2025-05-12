@@ -54,8 +54,8 @@ def test(*args):
 if __name__ == "__main__":
     #task = Async()
     try:
-        result = 30120425528 / 1068710001364596
-        print (f"{result:.9f}")
+        result = 1000000 / 20297279103
+        print (f"{result:.8f}")
         #asyncio.run(task.start())
     except KeyboardInterrupt:
         print("程序被手动终止了")
