@@ -153,7 +153,7 @@ class PumpfunNewMintParser(TransactionParserInterface):
         new_price = await self.get_mint_price(mint) 
         createMint = await SwapRecordService().get_mint(mint = mint)
         if createMint is None:
-            raise Exception("create mint not found")
+            return False
         logger.info(f"get create mint: {createMint}")
         oldPrice = createMint.input_amount / createMint.output_amount
         price_change = self.calculate_price_change(new_price, oldPrice)
@@ -195,7 +195,7 @@ class PumpfunNewMintParser(TransactionParserInterface):
             pre_token_balance = token_amount_change["pre_balance"]
             post_token_balance = token_amount_change["post_balance"]
         else:
-            if not await self.needClosePotision():
+            if await self.needClosePotision() is False:
                 raise NotSwapTransaction()
             from_amount = abs(token_amount_change["change_amount"])
             from_decimals = token_amount_change["decimals"]

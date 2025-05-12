@@ -4,7 +4,7 @@ from solbot_common.models.swap_record import TransactionStatus ,SwapRecord
 from solbot_db.session import NEW_ASYNC_SESSION, provide_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
-
+from solbot_common.log import logger
 
 class SwapRecordService:
 
@@ -28,5 +28,6 @@ class SwapRecordService:
         cls, mint:str ,session :AsyncSession
     ) -> SwapRecord | None:
         stmt = select(SwapRecord).where(SwapRecord.status == TransactionStatus.SUCCESS, SwapRecord.output_mint == mint).limit(1)
+        logger.info(f"mint: {mint} , stmt: {stmt}")
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
